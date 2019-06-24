@@ -1,0 +1,73 @@
+trigger:
+- master
+
+variables:
+  - name: BuildConfiguration
+    value: Release
+  - name: Version
+    value: $[ coalesce(variables['vlc.version'], variables['vlc.latest']) ]
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+## Crawler ######################################################################
+# - task: DotNetCoreCLI@2
+#   displayName: Build crawler
+#   inputs:
+#     command: 'pack'
+#     projects: 'Crawler\VlcCrawler.sln'
+#     versioningScheme: 'off'
+
+# - task: CopyFiles@2
+#   displayName: Copy crawler to artifacts
+#   inputs:
+#     Contents: 'Crawler\VlcCrawler\bin\Release\**\publish\**'
+#     TargetFolder: '$(Build.ArtifactStagingDirectory)\Crawler'
+
+# - task: PublishBuildArtifacts@1
+#   displayName: Publish crawler artifacts
+#   inputs:
+#     PathtoPublish: '$(Build.ArtifactStagingDirectory)\Crawler'
+#     ArtifactName: 'Crawler'
+#     publishLocation: 'Container'
+
+
+## Docker ######################################################################
+- task: DownloadFile@1
+  displayName: Download VLC to artifacts (so the release pipeline is reproductible)
+  inputs:
+    FileUrl: 'https://mirror.csclub.uwaterloo.ca/vlc/vlc/$(Version)/win64/vlc-$(Version)-win64.zip'
+    DestinationFolder: 'vlc-$(Version).zip'
+    requireAuthentication: false
+
+- task: RegexReplace@3
+  displayName: Generate Dockerfile for the given version
+  inputs:
+    InputSearchPattern: 'Dockerfile'
+    FindRegex: '\{vlc\.version\}'
+    ReplaceRegex: '$(Version)'
+    UseUTF8: true
+
+- task: CopyFiles@2
+  displayName: Copy Dockerfile and VLC zip installer to artifacts
+  inputs:
+    Contents: 'Dockerfile
+       vlc-$(Version).zip'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\Docker'
+    
+- task: PublishBuildArtifacts@1
+  displayName: Publish Dockerfile (and config) artifacts
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\Docker'
+    ArtifactName: 'Docker file'
+    publishLocation: 'Container'
+
+# This is the last task as it's the longest, and we don't needs it output
+- task: Docker@2
+  displayName: Validate that the generated Dockerfile is valid
+  inputs:
+    repository: 'dr1rrb/vlc-win'
+    command: 'build'
+    tags: latest
+
