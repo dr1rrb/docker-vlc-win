@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/windows/servercore:1809
 
 # Copy and unzip VLC
-COPY vlc-{vlc.version}.zip C:\\vlc.zip
+COPY vlc-{vlc.version}-win64.zip C:\\vlc.zip
 RUN cmd /C tar -xf C:\\vlc.zip & del vlc.zip
 
 # Image config

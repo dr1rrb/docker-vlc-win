@@ -35,10 +35,10 @@ steps:
 
 ## Docker ######################################################################
 - task: DownloadFile@1
-  displayName: Download VLC to artifacts (so the release pipeline is reproductible)
+  displayName: Download VLC
   inputs:
     FileUrl: 'https://mirror.csclub.uwaterloo.ca/vlc/vlc/$(Version)/win64/vlc-$(Version)-win64.zip'
-    DestinationFolder: 'vlc-$(Version).zip'
+    DestinationFolder: '$(System.DefaultWorkingDirectory)'
     requireAuthentication: false
 
 - task: RegexReplace@3
@@ -52,15 +52,20 @@ steps:
 - task: CopyFiles@2
   displayName: Copy Dockerfile and VLC zip installer to artifacts
   inputs:
-    Contents: 'Dockerfile
-       vlc-$(Version).zip'
+    Contents: 'Dockerfile'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\Docker'
+
+- task: CopyFiles@2
+  displayName: Copy VLC to artifacts (so the release pipeline is reproductible)
+  inputs:
+    Contents: 'vlc-$(Version)-win64.zip'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\Docker'
     
 - task: PublishBuildArtifacts@1
-  displayName: Publish Dockerfile (and config) artifacts
+  displayName: Publish docker artifacts
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\Docker'
-    ArtifactName: 'Docker file'
+    ArtifactName: 'Docker'
     publishLocation: 'Container'
 
 # This is the last task as it's the longest, and we don't needs it output
