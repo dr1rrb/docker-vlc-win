@@ -4,13 +4,17 @@ trigger:
 variables:
   - name: BuildConfiguration
     value: Release
-  - name: Version
-    value: $[ coalesce(variables['vlc.version'], variables['vlc.latest']) ]
 
 pool:
   vmImage: 'windows-2019'
 
 steps:
+- task: PowerShell@2
+  displayName: Get config
+  inputs:
+    filePath: 'azure-pipelines.get-config.ps1'
+    failOnStderr: true
+
 ## Crawler ######################################################################
 # - task: DotNetCoreCLI@2
 #   displayName: Build crawler
@@ -37,7 +41,7 @@ steps:
 - task: DownloadFile@1
   displayName: Download VLC
   inputs:
-    FileUrl: 'https://mirror.csclub.uwaterloo.ca/vlc/vlc/$(Version)/win64/vlc-$(Version)-win64.zip'
+    FileUrl: 'https://mirror.csclub.uwaterloo.ca/vlc/vlc/$(vlc.version)/win64/vlc-$(vlc.version)-win64.zip'
     DestinationFolder: '$(System.DefaultWorkingDirectory)'
     requireAuthentication: false
 
@@ -46,19 +50,16 @@ steps:
   inputs:
     InputSearchPattern: 'Dockerfile'
     FindRegex: '\{vlc\.version\}'
-    ReplaceRegex: '$(Version)'
+    ReplaceRegex: '$(vlc.version)'
     UseUTF8: true
 
 - task: CopyFiles@2
   displayName: Copy Dockerfile and VLC zip installer to artifacts
   inputs:
-    Contents: 'Dockerfile'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\Docker'
-
-- task: CopyFiles@2
-  displayName: Copy VLC to artifacts (so the release pipeline is reproductible)
-  inputs:
-    Contents: 'vlc-$(Version)-win64.zip'
+    Contents: |
+      config.txt
+      Dockerfile
+      vlc-$(vlc.version)-win64.zip
     TargetFolder: '$(Build.ArtifactStagingDirectory)\Docker'
     
 - task: PublishBuildArtifacts@1
