@@ -2,6 +2,7 @@
 Run the [VLC](https://www.videolan.org/) on a Windows container host.
 
 [![Build Status](https://dev.azure.com/dr1rrb/docker-vlc-win/_apis/build/status/dr1rrb.docker-vlc-win?branchName=master)](https://dev.azure.com/dr1rrb/docker-vlc-win/_build/latest?definitionId=1&branchName=master)
+![crawler](https://healthchecks.io/badge/f60b3b33-b1b8-421c-b017-1a5ac2bba03c/AjJHxxsw/crawler.svg "crawler")
 
 ## Configuration
 ### Network
@@ -54,3 +55,8 @@ Usually when running a Windows container, we need it to integrates with other se
 If you have an active directory (AD), it's pretty easy to give a valid network identity to your container.
 You can find more info [here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/manage-serviceaccounts)
 and [here](https://artisticcheese.wordpress.com/2017/09/09/enabling-integrated-windows-authentication-in-windows-docker-container/).
+
+## Crawler
+A crawler is running every day to check if a new release of VLC is avaible on [here](https://download.videolan.org/pub/videolan/vlc/) and automatically build a new docker image for it. 
+
+Here are the status of this crawler: [crawler](https://healthchecks.io/badge/f60b3b33-b1b8-421c-b017-1a5ac2bba03c/AjJHxxsw/crawler.svg "crawler")

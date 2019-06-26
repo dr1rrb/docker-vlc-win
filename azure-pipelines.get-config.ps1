@@ -7,7 +7,6 @@ $latest = $Env:VLC_LATEST;
 $tags = $Env:VLC_TAGS;
 
 # Capture all variables prefixed by VLC
-# $variables = "Env:VLC_*" | Get-Item | Select @{l="Key";e={$_.Name.ToString().Split('_')[1].ToLower()}}, Value
 $variables = @{}
 "Env:VLC_*" | Get-Item | ForEach { $variables[$_.Name.ToString().Split('_')[1].ToLower()] = $_.Value }
 
