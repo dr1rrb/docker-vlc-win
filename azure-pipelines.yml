@@ -2,6 +2,7 @@ trigger:
 - master
 
 variables:
+  - group: vlc
   - name: BuildConfiguration
     value: Release
 
@@ -16,32 +17,32 @@ steps:
     failOnStderr: true
 
 ## Crawler ######################################################################
-# - task: DotNetCoreCLI@2
-#   displayName: Build crawler
-#   inputs:
-#     command: 'pack'
-#     projects: 'Crawler\VlcCrawler.sln'
-#     versioningScheme: 'off'
+- task: DotNetCoreCLI@2
+  displayName: Build crawler
+  inputs:
+    command: 'pack'
+    projects: 'Crawler\VlcCrawler.sln'
+    versioningScheme: 'off'
 
-# - task: CopyFiles@2
-#   displayName: Copy crawler to artifacts
-#   inputs:
-#     Contents: 'Crawler\VlcCrawler\bin\Release\**\publish\**'
-#     TargetFolder: '$(Build.ArtifactStagingDirectory)\Crawler'
+- task: CopyFiles@2
+  displayName: Copy crawler to artifacts
+  inputs:
+    Contents: 'Crawler\VlcCrawler\bin\Release\**\publish\**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\Crawler'
 
-# - task: PublishBuildArtifacts@1
-#   displayName: Publish crawler artifacts
-#   inputs:
-#     PathtoPublish: '$(Build.ArtifactStagingDirectory)\Crawler'
-#     ArtifactName: 'Crawler'
-#     publishLocation: 'Container'
+- task: PublishBuildArtifacts@1
+  displayName: Publish crawler artifacts
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\Crawler'
+    ArtifactName: 'Crawler'
+    publishLocation: 'Container'
 
 
 ## Docker ######################################################################
 - task: DownloadFile@1
   displayName: Download VLC
   inputs:
-    FileUrl: 'https://mirror.csclub.uwaterloo.ca/vlc/vlc/$(vlc.version)/win64/vlc-$(vlc.version)-win64.zip'
+    FileUrl: 'https://download.videolan.org/pub/videolan/vlc/$(vlc.version)/win64/vlc-$(vlc.version)-win64.zip'
     DestinationFolder: '$(System.DefaultWorkingDirectory)'
     requireAuthentication: false
 
